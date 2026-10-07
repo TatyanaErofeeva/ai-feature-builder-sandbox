@@ -20,7 +20,7 @@ export function SessionLog() {
   }, [logs]);
 
   return (
-    <section className="flex h-36 shrink-0 flex-col border-t border-[rgba(158,186,214,0.14)]" aria-label="Журнал сессии">
+    <section className="flex h-36 shrink-0 flex-col border-t border-[rgba(158,186,214,0.14)]" aria-label="Session log">
       <Typography
         component="h2"
         sx={{
@@ -33,11 +33,11 @@ export function SessionLog() {
           letterSpacing: '0.16em',
         }}
       >
-        ЖУРНАЛ
+        LOG
       </Typography>
       <div className="min-h-0 flex-1 overflow-auto px-3 pb-2">
         {logs.length === 0 ? (
-          <p className="m-0 font-mono text-[12px] text-[#6d7d90]">Событий пока нет</p>
+          <p className="m-0 font-mono text-[12px] text-[#6d7d90]">No events yet</p>
         ) : (
           logs.map((entry) => (
             <p key={entry.id} className="m-0 mb-1 font-mono text-[11px] leading-4 text-[#c5d0dc]">
@@ -53,7 +53,7 @@ export function SessionLog() {
 }
 
 function formatTime(timestamp: number): string {
-  return new Date(timestamp).toLocaleTimeString('ru-RU', {
+  return new Date(timestamp).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',

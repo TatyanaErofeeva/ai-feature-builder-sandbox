@@ -7,17 +7,17 @@ export interface PromptExample {
 export const PROMPT_EXAMPLES: readonly PromptExample[] = [
   {
     id: 'auth',
-    label: 'Форма входа',
-    prompt: 'Собери фичу AuthForm: форма входа с email и паролем',
+    label: 'Sign-in form',
+    prompt: 'Build an AuthForm feature: a sign-in form with email and password',
   },
   {
     id: 'todo',
-    label: 'Список задач',
-    prompt: 'Собери фичу TodoList: список задач с добавлением и отметкой',
+    label: 'Task list',
+    prompt: 'Build a TodoList feature: a task list with add and toggle',
   },
   {
     id: 'metrics',
-    label: 'Панель метрик',
-    prompt: 'Собери фичу MetricsBoard: панель инженерных метрик',
+    label: 'Metrics board',
+    prompt: 'Build a MetricsBoard feature: an engineering metrics panel',
   },
 ];

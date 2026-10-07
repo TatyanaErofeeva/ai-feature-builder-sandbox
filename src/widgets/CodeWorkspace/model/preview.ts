@@ -92,7 +92,7 @@ sample({
   clock: $previewSource.updates,
   source: $activeFilePath,
   filter: (_, source) => source === null,
-  fn: (path) => path ?? 'файл',
+  fn: (path) => path ?? 'file',
   target: unsupportedSelected,
 });
 

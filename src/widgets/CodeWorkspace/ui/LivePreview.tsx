@@ -19,8 +19,8 @@ export function LivePreview() {
   }, []);
 
   return (
-    <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col" aria-label="Изолированное превью">
-      <PaneHeader title="ПРЕВЬЮ" hint={hintFor(preview)} />
+    <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col" aria-label="Isolated preview">
+      <PaneHeader title="PREVIEW" hint={hintFor(preview)} />
       <div className="relative min-h-0 flex-1 overflow-auto bg-[#0c1218] bg-[radial-gradient(circle_at_top,rgba(62,224,176,0.08),transparent_42%)]">
         <PreviewBody preview={preview} generating={generating} />
       </div>
@@ -36,8 +36,8 @@ function PreviewBody({ preview, generating }: { preview: PreviewModel; generatin
   if (preview.phase === 'unsupported') {
     return (
       <Message
-        title="Превью ждёт TSX"
-        text={`Сейчас открыт ${preview.path}. Компонент рисуется из default-экспорта активного TSX-файла.`}
+        title="Preview is waiting for TSX"
+        text={`Currently open: ${preview.path}. The component is rendered from the default export of the active TSX file.`}
       />
     );
   }
@@ -45,14 +45,14 @@ function PreviewBody({ preview, generating }: { preview: PreviewModel; generatin
   if (preview.phase === 'empty' || (preview.phase === 'error' && generating)) {
     return (
       <Message
-        title="Сборка потока"
-        text="Код ещё не собрался в валидный модуль. Превью обновится, когда компонент закроется."
+        title="Streaming build"
+        text="The code is not a valid module yet. The preview updates when the component is complete."
       />
     );
   }
 
   if (preview.phase === 'error') {
-    return <CompileErrorScreen title="ОШИБКА КОМПИЛЯЦИИ" message={preview.message} />;
+    return <CompileErrorScreen title="COMPILATION ERROR" message={preview.message} />;
   }
 
   const View = preview.Component;
@@ -66,7 +66,7 @@ function PreviewBody({ preview, generating }: { preview: PreviewModel; generatin
 
 function PreviewSkeleton() {
   return (
-    <Box className="flex h-full flex-col gap-3 p-5" aria-busy="true" aria-label="Скелет превью">
+    <Box className="flex h-full flex-col gap-3 p-5" aria-busy="true" aria-label="Preview skeleton">
       <Skeleton variant="rounded" animation="wave" height={18} width="28%" sx={{ bgcolor: 'rgba(62,224,176,0.14)' }} />
       <Skeleton variant="rounded" animation="wave" height={148} sx={{ bgcolor: 'rgba(213,222,232,0.06)' }} />
       <Skeleton variant="rounded" animation="wave" height={36} width="34%" sx={{ bgcolor: 'rgba(142,182,255,0.12)' }} />

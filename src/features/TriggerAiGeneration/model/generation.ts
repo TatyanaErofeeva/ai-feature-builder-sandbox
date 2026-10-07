@@ -48,7 +48,7 @@ export const streamGenerationFx = createEffect(async (request: GenerationRequest
   metricsReset();
   logAppended({
     level: 'info',
-    message: `Промпт принят: ${prompt}`,
+    message: `Prompt accepted: ${prompt}`,
   });
 
   for (const file of plan.files) {
@@ -57,7 +57,7 @@ export const streamGenerationFx = createEffect(async (request: GenerationRequest
   foldersExpanded(plan.files.flatMap((file) => ancestorPaths(file.path)));
   logAppended({
     level: 'info',
-    message: `В дерево добавлен слайс src/features/${plan.featureName}`,
+    message: `Added slice src/features/${plan.featureName} to the tree`,
   });
 
   let streamed = 0;
@@ -71,7 +71,7 @@ export const streamGenerationFx = createEffect(async (request: GenerationRequest
 
       selectActiveFile(file.path);
       streamingFileChanged(file.path);
-      logAppended({ level: 'info', message: `Поток: ${file.path}` });
+      logAppended({ level: 'info', message: `Streaming: ${file.path}` });
 
       let written = '';
 
@@ -105,7 +105,7 @@ export const streamGenerationFx = createEffect(async (request: GenerationRequest
     statusChanged('ready');
     logAppended({
       level: 'success',
-      message: `Слайс ${plan.featureName} собран`,
+      message: `Slice ${plan.featureName} successfully assembled`,
     });
   } catch (error) {
     if (id !== runId) {
@@ -116,7 +116,7 @@ export const streamGenerationFx = createEffect(async (request: GenerationRequest
     statusChanged('error');
     logAppended({
       level: 'error',
-      message: error instanceof Error ? error.message : 'Сбой генерации',
+      message: error instanceof Error ? error.message : 'Generation failed',
     });
     throw error;
   }
@@ -153,7 +153,7 @@ generationStopRequested.watch(() => {
   activeRunId = 0;
   streamingFileChanged(null);
   statusChanged('idle');
-  logAppended({ level: 'info', message: 'Генерация остановлена' });
+  logAppended({ level: 'info', message: 'Generation stopped' });
 });
 
 function publishSpeed(streamed: number, startedAt: number): void {

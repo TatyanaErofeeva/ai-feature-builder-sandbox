@@ -185,14 +185,14 @@ export default function ${featureName}() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!email.includes("@")) {
-      setMessage("Нужен корректный email");
+      setMessage("Enter a valid email");
       return;
     }
     if (password.length < 6) {
-      setMessage("Пароль должен быть не короче 6 символов");
+      setMessage("Password must be at least 6 characters");
       return;
     }
-    setMessage("Сессия создана для " + email);
+    setMessage("Session created for " + email);
   };
 
   return (
@@ -201,7 +201,7 @@ export default function ${featureName}() {
         <p style={{ margin: 0, color: "#8eb6ff", letterSpacing: "0.14em", fontSize: 11 }}>
           FEATURE / AUTH
         </p>
-        <h2 style={{ margin: "8px 0 0", fontSize: 24 }}>Вход в консоль</h2>
+        <h2 style={{ margin: "8px 0 0", fontSize: 24 }}>Sign in</h2>
         <label style={label}>
           Email
           <input
@@ -213,7 +213,7 @@ export default function ${featureName}() {
           />
         </label>
         <label style={label}>
-          Пароль
+          Password
           <input
             style={field}
             value={password}
@@ -223,7 +223,7 @@ export default function ${featureName}() {
           />
         </label>
         <button style={submit} type="submit">
-          Создать сессию
+          Create session
         </button>
         <p style={note}>{message}</p>
       </form>
@@ -284,8 +284,8 @@ const item = {
 export default function ${featureName}() {
   const [draft, setDraft] = useState("");
   const [tasks, setTasks] = useState([
-    { id: 1, title: "Собрать слайс", done: true },
-    { id: 2, title: "Проверить превью", done: false },
+    { id: 1, title: "Assemble the slice", done: true },
+    { id: 2, title: "Check the preview", done: false },
   ]);
 
   const addTask = (event: React.FormEvent<HTMLFormElement>) => {
@@ -310,17 +310,17 @@ export default function ${featureName}() {
         <p style={{ margin: 0, color: "#3ee0b0", letterSpacing: "0.14em", fontSize: 11 }}>
           FEATURE / TASKS
         </p>
-        <h2 style={{ margin: "8px 0 0", fontSize: 24 }}>Очередь слайса</h2>
-        <p style={{ margin: "8px 0 0", color: "#93a4b8" }}>Открыто: {openCount}</p>
+        <h2 style={{ margin: "8px 0 0", fontSize: 24 }}>Slice queue</h2>
+        <p style={{ margin: "8px 0 0", color: "#93a4b8" }}>Open: {openCount}</p>
         <form style={composer} onSubmit={addTask}>
           <input
             style={field}
             value={draft}
-            placeholder="Новая задача"
+            placeholder="New task"
             onChange={(event) => setDraft(event.target.value)}
           />
           <button style={add} type="submit">
-            Добавить
+            Add
           </button>
         </form>
         <div>
@@ -377,7 +377,7 @@ export default function ${featureName}() {
       <p style={{ margin: 0, color: "#8eb6ff", letterSpacing: "0.14em", fontSize: 11 }}>
         FEATURE / METRICS
       </p>
-      <h2 style={{ margin: "8px 0 0", fontSize: 24 }}>Контур наблюдаемости</h2>
+      <h2 style={{ margin: "8px 0 0", fontSize: 24 }}>Observability</h2>
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         {windows.map((item) => (
           <button
@@ -454,7 +454,7 @@ export default function ${featureName}() {
             cursor: "pointer",
           }}
         >
-          Отметить проверку
+          Mark check
         </button>
         <p style={{ margin: "12px 0 0", fontFamily: "ui-monospace, monospace" }}>checks: {checks}</p>
       </article>

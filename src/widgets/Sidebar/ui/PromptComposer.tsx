@@ -57,22 +57,22 @@ export function PromptComposer() {
             }
           }
         }}
-        placeholder="Опишите FSD-фичу: форма входа, список задач, панель метрик"
+        placeholder="Generate FSD feature (e.g., AuthCard)..."
         multiline
         minRows={3}
         maxRows={5}
         fullWidth
         size="small"
         disabled={generating}
-        aria-label="Промпт для генерации фичи"
+        aria-label="Feature generation prompt"
       />
       {generating ? (
         <Button type="button" variant="outlined" color="warning" onClick={() => stop()}>
-          Остановить
+          Stop
         </Button>
       ) : (
         <Button type="submit" variant="contained" disabled={trimmed.length === 0}>
-          Сгенерировать
+          Generate Feature
         </Button>
       )}
     </form>

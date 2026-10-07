@@ -23,7 +23,7 @@ export function SandboxPage() {
             className="shrink-0 truncate border-b border-zinc-800 px-4 py-2 font-mono text-[11px] text-zinc-500"
             data-testid="active-file-path"
           >
-            {activeFilePath ?? 'файл не выбран'}
+            {activeFilePath ?? 'No file selected'}
           </p>
           <div className="min-h-0 flex-1">
             <CodeWorkspace />

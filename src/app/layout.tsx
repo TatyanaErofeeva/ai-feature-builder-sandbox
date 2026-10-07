@@ -17,7 +17,7 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'AI Feature Builder Sandbox',
-  description: 'Песочница сборки FSD-фич со стримингом кода и изолированным превью',
+  description: 'Sandbox for building FSD features with code streaming and an isolated preview',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

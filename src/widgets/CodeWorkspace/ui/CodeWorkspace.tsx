@@ -328,7 +328,7 @@ function ComponentRunner({
   }
 
   if (!compiled || compiled.content !== file.content) {
-    return <p className="font-mono text-sm text-zinc-500">Сборка превью…</p>;
+    return <p className="font-mono text-sm text-zinc-500">Compiling preview...</p>;
   }
 
   if (!compiled.ok) {

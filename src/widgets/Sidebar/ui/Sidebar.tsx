@@ -18,7 +18,7 @@ export function Sidebar() {
             letterSpacing: '0.16em',
           }}
         >
-          ПРОЕКТ
+          PROJECT
         </Typography>
       </div>
       <FileTree />

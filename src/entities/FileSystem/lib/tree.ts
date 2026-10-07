@@ -15,7 +15,7 @@ export function insertFileNode(state: FileSystemState, file: NewFilePayload): Fi
   const fileName = segments[segments.length - 1];
 
   if (!fileName || segments.length < 2) {
-    throw new Error(`Некорректный путь файла: ${file.path}`);
+    throw new Error(`Invalid file path: ${file.path}`);
   }
 
   let next = state;
@@ -31,7 +31,7 @@ export function insertFileNode(state: FileSystemState, file: NewFilePayload): Fi
     const current = next[id];
 
     if (current?.type === 'file') {
-      throw new Error(`Путь занят файлом: ${id}`);
+      throw new Error(`Path is already a file: ${id}`);
     }
 
     if (!current) {

@@ -37,7 +37,7 @@ export const streamTextIntoActiveFile = createEffect(async (text: string): Promi
   const path = $activeFilePath.getState();
 
   if (!path) {
-    throw new Error('Нет активного файла для стриминга');
+    throw new Error('No active file selected for streaming');
   }
 
   statusChanged('generating');
@@ -79,7 +79,7 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
   const root = `src/${layer}/${name}`;
 
   if (folderExists($fileSystem.getState(), root)) {
-    throw new Error(`Слайс ${root} уже есть в проекте`);
+    throw new Error(`Slice ${root} already exists in the project`);
   }
 
   const componentPath = `${root}/ui/${name}.tsx`;
@@ -88,7 +88,7 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
   statusChanged('generating');
   logAppended({
     level: 'info',
-    message: `Сборка слайса ${root}`,
+    message: `Assembling slice ${root}`,
   });
 
   await wait(SERVER_DELAY_MS);
@@ -114,7 +114,7 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
   selectActiveFile(componentPath);
   logAppended({
     level: 'info',
-    message: `Поток: ${componentPath}`,
+    message: `Streaming: ${componentPath}`,
   });
 
   let finished = false;
@@ -126,7 +126,7 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
     statusChanged('error');
     logAppended({
       level: 'error',
-      message: error instanceof Error ? error.message : 'Сбой генерации',
+      message: error instanceof Error ? error.message : 'Generation failed',
     });
     throw error;
   }
@@ -137,7 +137,7 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
 
   logAppended({
     level: 'success',
-    message: `Слайс ${name} собран`,
+    message: `Slice ${name} successfully assembled`,
   });
 });
 
@@ -151,7 +151,7 @@ function assertSliceName(sliceName: string): string {
   const name = sliceName.trim();
 
   if (!/^[A-Z][A-Za-z0-9]*$/.test(name)) {
-    throw new Error('Имя слайса должно быть в PascalCase, без путей и символов');
+    throw new Error('Slice name must be in PascalCase, without paths or special characters');
   }
 
   return name;
@@ -188,7 +188,7 @@ export default function ${sliceName}() {
   return (
     <section style={shell}>
       <h1 style={{ margin: 0, fontSize: 28 }}>${sliceName}</h1>
-      <p style={{ margin: 0, color: "#8ea0b5" }}>Слайс ${layer}/${sliceName}</p>
+      <p style={{ margin: 0, color: "#8ea0b5" }}>FSD Layer: ${layer} | Slice: ${sliceName}</p>
     </section>
   );
 }

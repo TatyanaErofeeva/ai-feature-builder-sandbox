@@ -25,7 +25,7 @@ export function FileTree() {
   const openFile = useUnit(fileOpenRequested);
 
   return (
-    <div className="min-h-0 flex-1 overflow-auto py-2" role="tree" aria-label="Дерево файлов">
+    <div className="min-h-0 flex-1 overflow-auto py-2" role="tree" aria-label="File tree">
       <TreeLevel
         ids={rootIds(tree)}
         nodes={tree}

@@ -29,12 +29,12 @@ export class PreviewErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error('Ошибка изолированного превью', error, info.componentStack);
+    console.error('Isolated preview error', error, info.componentStack);
   }
 
   render(): ReactNode {
     if (this.state.error) {
-      return <CompileErrorScreen title="ОШИБКА ВЫПОЛНЕНИЯ" message={this.state.error.message} />;
+      return <CompileErrorScreen title="RUNTIME ERROR" message={this.state.error.message} />;
     }
 
     return this.props.children;

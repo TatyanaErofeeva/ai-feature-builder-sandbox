@@ -23,10 +23,10 @@ const STATUS_DOT: Record<SessionStatus, string> = {
 };
 
 const STATUS_LABEL: Record<SessionStatus, string> = {
-  idle: 'Ожидание',
-  ready: 'Готово',
-  generating: 'Генерация',
-  error: 'Ошибка',
+  idle: 'Idle',
+  ready: 'Ready',
+  generating: 'Generating',
+  error: 'Error',
 };
 
 export function TopBar() {
@@ -54,7 +54,7 @@ export function TopBar() {
           size="small"
           value={modelId}
           disabled={generating}
-          aria-label="Модель генерации"
+          aria-label="Generation model"
           onChange={(event) => {
             const next = event.target.value;
             if (isModelId(next)) {

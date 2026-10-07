@@ -49,13 +49,13 @@ export function compileComponent(
   }
 
   if (transformed.trim().length === 0) {
-    return { ok: false, message: 'Компилятор вернул пустой модуль' };
+    return { ok: false, message: 'Compiler returned an empty module' };
   }
 
   const rewritten = ensureReactInScope(rewriteModuleSyntax(transformed));
 
   if (!rewritten.includes('__defaultExport')) {
-    return { ok: false, message: 'В файле нет default-экспорта компонента' };
+    return { ok: false, message: 'File has no default component export' };
   }
 
   try {
@@ -69,11 +69,11 @@ export function compileComponent(
         return react;
       }
 
-      throw new Error(`Импорт "${id}" недоступен в изолированном превью`);
+      throw new Error(`Import "${id}" is not available in the isolated preview`);
     });
 
     if (typeof exported !== 'function') {
-      return { ok: false, message: 'Default-экспорт не является React-компонентом' };
+      return { ok: false, message: 'Default export is not a React component' };
     }
 
     return { ok: true, Component: exported as ComponentType };
@@ -92,7 +92,7 @@ function resolveBabel(babelModule: typeof BabelTypes): BabelTransform {
     return fallback;
   }
 
-  throw new Error('Babel standalone не экспортирует transform');
+  throw new Error('Babel standalone does not export transform');
 }
 
 function isBabelTransform(value: unknown): value is BabelTransform {
@@ -142,5 +142,5 @@ function errorText(error: unknown): string {
     return error.message;
   }
 
-  return 'Неизвестная ошибка компиляции';
+  return 'Unknown compilation error';
 }

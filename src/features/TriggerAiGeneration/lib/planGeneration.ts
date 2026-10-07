@@ -8,9 +8,9 @@ export interface GenerationPlan {
 }
 
 const KIND_RULES: ReadonlyArray<{ kind: FeatureKind; pattern: RegExp; fallback: string }> = [
-  { kind: 'auth', pattern: /auth|login|sign[\s-]?in|вход|авториз|логин|парол/i, fallback: 'AuthForm' },
-  { kind: 'todo', pattern: /todo|task|задач|список/i, fallback: 'TodoList' },
-  { kind: 'metrics', pattern: /dashboard|metric|метрик|аналитик|наблюда/i, fallback: 'MetricsBoard' },
+  { kind: 'auth', pattern: /auth|login|sign[\s-]?in|password/i, fallback: 'AuthForm' },
+  { kind: 'todo', pattern: /todo|task|list/i, fallback: 'TodoList' },
+  { kind: 'metrics', pattern: /dashboard|metric|analytics|observability/i, fallback: 'MetricsBoard' },
 ];
 
 export function planGeneration(prompt: string, tree: FileSystemState): GenerationPlan {
