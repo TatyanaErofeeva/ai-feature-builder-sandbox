@@ -29,6 +29,7 @@ const REACT_EDITOR_TYPES = `
 declare namespace React {
   type ReactNode = any;
   type FC<P = Record<string, unknown>> = (props: P) => ReactNode;
+  type FormEvent<T = any> = any;
   function createElement(...args: any[]): any;
 }
 
@@ -43,6 +44,7 @@ declare global {
 
 declare module "react" {
   export type ReactNode = any;
+  export type FormEvent<T = any> = any;
   export function useState<S = any>(initial: S | (() => S)): [S, (value: S | ((prev: S) => S)) => void];
   export function useEffect(effect: () => void | (() => void), deps?: readonly unknown[]): void;
   export function useMemo<T>(factory: () => T, deps: readonly unknown[]): T;
