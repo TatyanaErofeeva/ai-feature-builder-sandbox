@@ -332,10 +332,25 @@ function ComponentRunner({
   }
 
   if (!compiled.ok) {
-    throw new Error(compiled.message);
+    return <CompilationMessage message={compiled.message} />;
   }
 
-  const View = compiled.Component;
+  const View = compiled.Component as ComponentType<{ children?: ReactNode }>;
+
+  if (file.name === 'layout.tsx') {
+    return (
+      <View>
+        <div className="rounded border border-dashed border-zinc-700 bg-zinc-900/50 p-4 text-center font-mono text-xs text-zinc-400">
+          [ Layout Content Shell Area ]
+          <br />
+          <span className="text-[10px] text-zinc-500">
+            Children components inject seamlessly here in production
+          </span>
+        </div>
+      </View>
+    );
+  }
+
   return <View />;
 }
 

@@ -34,7 +34,7 @@ export function compileComponent(
 
   try {
     const babel = resolveBabel(babelModule);
-    const result = babel.transform(source, {
+    const result = babel.transform(neutralizeDocumentTags(source), {
       filename: 'Preview.tsx',
       sourceType: 'module',
       comments: false,
@@ -101,6 +101,16 @@ function isBabelTransform(value: unknown): value is BabelTransform {
   }
 
   return typeof value.transform === 'function';
+}
+
+function neutralizeDocumentTags(source: string): string {
+  if (!/<\/?(?:html|head|body)\b/i.test(source)) {
+    return source;
+  }
+
+  return source
+    .replace(/<(html|head|body)\b([^>]*)>/gi, '<div data-layer="layout-mock"$2>')
+    .replace(/<\/(html|head|body)>/gi, '</div>');
 }
 
 function ensureReactInScope(code: string): string {

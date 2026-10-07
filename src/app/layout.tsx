@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru" className={`${manrope.variable} ${jetbrains.variable} h-full`}>
+    <html lang="en" className={`${manrope.variable} ${jetbrains.variable} h-full`}>
       <body className="h-full bg-[#0b0f14] font-sans antialiased">
         <AppProviders>{children}</AppProviders>
       </body>

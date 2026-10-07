@@ -17,6 +17,7 @@ import {
   updateFileContent,
 } from '@/entities/FileSystem';
 import { planGeneration } from '../lib/planGeneration';
+import { abortSliceGeneration } from './store';
 import { wait } from '../lib/wait';
 
 export interface GenerationRequest {
@@ -35,6 +36,7 @@ export const $prompt = createStore('')
 
 let runId = 0;
 let activeRunId = 0;
+let ignoreSubmitsUntil = 0;
 
 export const streamGenerationFx = createEffect(async (request: GenerationRequest) => {
   const id = ++runId;
@@ -72,6 +74,10 @@ export const streamGenerationFx = createEffect(async (request: GenerationRequest
       selectActiveFile(file.path);
       streamingFileChanged(file.path);
       logAppended({ level: 'info', message: `Streaming: ${file.path}` });
+
+      if (id !== runId) {
+        return;
+      }
 
       let written = '';
 
@@ -125,7 +131,8 @@ export const streamGenerationFx = createEffect(async (request: GenerationRequest
 sample({
   clock: promptSubmitted,
   source: { prompt: $prompt, charsPerSecond: $charsPerSecond, generating: $isGenerating },
-  filter: ({ prompt, generating }) => !generating && prompt.trim().length > 0,
+  filter: ({ prompt, generating }) =>
+    !generating && prompt.trim().length > 0 && performance.now() >= ignoreSubmitsUntil,
   fn: ({ prompt, charsPerSecond }) => ({
     prompt: prompt.trim(),
     charsPerSecond,
@@ -136,7 +143,8 @@ sample({
 sample({
   clock: exampleSelected,
   source: { charsPerSecond: $charsPerSecond, generating: $isGenerating },
-  filter: ({ generating }, prompt) => !generating && prompt.trim().length > 0,
+  filter: ({ generating }, prompt) =>
+    !generating && prompt.trim().length > 0 && performance.now() >= ignoreSubmitsUntil,
   fn: ({ charsPerSecond }, prompt) => ({
     prompt: prompt.trim(),
     charsPerSecond,
@@ -145,6 +153,9 @@ sample({
 });
 
 generationStopRequested.watch(() => {
+  ignoreSubmitsUntil = performance.now() + 600;
+  abortSliceGeneration();
+
   if (activeRunId === 0) {
     return;
   }
@@ -153,7 +164,7 @@ generationStopRequested.watch(() => {
   activeRunId = 0;
   streamingFileChanged(null);
   statusChanged('idle');
-  logAppended({ level: 'info', message: 'Generation stopped' });
+  logAppended({ level: 'info', message: 'Generation aborted by user' });
 });
 
 function publishSpeed(streamed: number, startedAt: number): void {

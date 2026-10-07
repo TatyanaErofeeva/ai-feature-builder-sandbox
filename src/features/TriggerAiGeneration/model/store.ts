@@ -1,4 +1,4 @@
-import { combine, createEffect } from 'effector';
+import { combine, createEffect, createEvent, createStore } from 'effector';
 import {
   logAppended,
   metricsReset,
@@ -30,14 +30,40 @@ export interface GenerateSliceParams {
 const SERVER_DELAY_MS = 700;
 const STREAM_INTERVAL_MS = 30;
 
+const abortLatched = createEvent();
+const generationArmed = createEvent();
+
+const $abortLatch = createStore(false)
+  .on(abortLatched, () => true)
+  .on(generationArmed, () => false);
+
+let aborted = false;
+let sliceToken = 0;
 let streamToken = 0;
 
+export function abortSliceGeneration(): void {
+  aborted = true;
+  sliceToken += 1;
+  streamToken += 1;
+  abortLatched();
+  streamingFileChanged(null);
+  statusChanged('idle');
+}
+
 export const streamTextIntoActiveFile = createEffect(async (text: string): Promise<boolean> => {
+  if (aborted) {
+    return false;
+  }
+
   const token = ++streamToken;
   const path = $activeFilePath.getState();
 
   if (!path) {
     throw new Error('No active file selected for streaming');
+  }
+
+  if (aborted || token !== streamToken) {
+    return false;
   }
 
   statusChanged('generating');
@@ -49,7 +75,7 @@ export const streamTextIntoActiveFile = createEffect(async (text: string): Promi
   let streamed = 0;
 
   for (const char of text) {
-    if (token !== streamToken) {
+    if (aborted || token !== streamToken) {
       return false;
     }
 
@@ -64,7 +90,7 @@ export const streamTextIntoActiveFile = createEffect(async (text: string): Promi
     await wait(STREAM_INTERVAL_MS);
   }
 
-  if (token !== streamToken) {
+  if (aborted || token !== streamToken) {
     return false;
   }
 
@@ -75,6 +101,9 @@ export const streamTextIntoActiveFile = createEffect(async (text: string): Promi
 });
 
 export const generateSliceFx = createEffect(async ({ layer, sliceName }: GenerateSliceParams) => {
+  aborted = false;
+  generationArmed();
+  const token = ++sliceToken;
   const name = assertSliceName(sliceName);
   const root = `src/${layer}/${name}`;
 
@@ -92,6 +121,11 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
   });
 
   await wait(SERVER_DELAY_MS);
+
+  if (aborted || token !== sliceToken) {
+    reportAbort();
+    return;
+  }
 
   appendFileOrFolder({
     path: `${root}/index.ts`,
@@ -112,6 +146,12 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
     `${root}/model`,
   ]);
   selectActiveFile(componentPath);
+
+  if (aborted || token !== sliceToken) {
+    reportAbort();
+    return;
+  }
+
   logAppended({
     level: 'info',
     message: `Streaming: ${componentPath}`,
@@ -122,6 +162,11 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
   try {
     finished = await streamTextIntoActiveFile(componentSource);
   } catch (error) {
+    if (aborted || token !== sliceToken) {
+      reportAbort();
+      return;
+    }
+
     streamingFileChanged(null);
     statusChanged('error');
     logAppended({
@@ -132,6 +177,7 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
   }
 
   if (!finished) {
+    reportAbort();
     return;
   }
 
@@ -144,8 +190,19 @@ export const generateSliceFx = createEffect(async ({ layer, sliceName }: Generat
 export const $isGenerating = combine(
   generateSliceFx.pending,
   streamTextIntoActiveFile.pending,
-  (slicePending, streamPending) => slicePending || streamPending,
+  $abortLatch,
+  (slicePending, streamPending, generationAborted) =>
+    !generationAborted && (slicePending || streamPending),
 );
+
+function reportAbort(): void {
+  streamingFileChanged(null);
+  statusChanged('idle');
+  logAppended({
+    level: 'info',
+    message: 'Generation aborted by user',
+  });
+}
 
 function assertSliceName(sliceName: string): string {
   const name = sliceName.trim();

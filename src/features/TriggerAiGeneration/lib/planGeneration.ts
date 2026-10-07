@@ -30,14 +30,25 @@ function detectKind(prompt: string): FeatureKind {
   return match?.kind ?? 'generic';
 }
 
+const CONTROL_VERBS = new Set(['Build', 'Create']);
+
 function detectName(prompt: string, kind: FeatureKind): string {
-  const explicit = prompt.match(/\b([A-Z][A-Za-z0-9]{2,})\b/);
-  if (explicit?.[1]) {
-    return toIdentifier(explicit[1]);
+  const namedFeature = prompt.match(/\b([A-Z][A-Za-z0-9]{2,})\s+feature\b/);
+  if (namedFeature?.[1] && !CONTROL_VERBS.has(namedFeature[1])) {
+    return toIdentifier(namedFeature[1]);
+  }
+
+  const pascalNames = [...prompt.matchAll(/\b([A-Z][A-Za-z0-9]{2,})\b/g)]
+    .map((match) => match[1])
+    .filter((name) => !CONTROL_VERBS.has(name));
+  const targetName = pascalNames.at(-1);
+
+  if (targetName) {
+    return toIdentifier(targetName);
   }
 
   const quoted = prompt.match(/["'«]([A-Za-z][A-Za-z0-9]+)["'»]/);
-  if (quoted?.[1]) {
+  if (quoted?.[1] && !CONTROL_VERBS.has(quoted[1])) {
     return toIdentifier(quoted[1]);
   }
 

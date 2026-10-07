@@ -66,15 +66,22 @@ export function PromptComposer() {
         disabled={generating}
         aria-label="Feature generation prompt"
       />
-      {generating ? (
-        <Button type="button" variant="outlined" color="warning" onClick={() => stop()}>
-          Stop
-        </Button>
-      ) : (
-        <Button type="submit" variant="contained" disabled={trimmed.length === 0}>
-          Generate Feature
-        </Button>
-      )}
+      <Button
+        type="button"
+        variant={generating ? 'outlined' : 'contained'}
+        color={generating ? 'warning' : 'primary'}
+        disabled={!generating && trimmed.length === 0}
+        onClick={() => {
+          if (generating) {
+            stop();
+            return;
+          }
+
+          submitPrompt();
+        }}
+      >
+        {generating ? 'Stop' : 'Generate Feature'}
+      </Button>
     </form>
   );
 }
