@@ -40,7 +40,7 @@ To maximize performance, manual inputs inside Monaco Editor use a debounced buff
 ```text
 src/
 ├── app/                  # Next.js App Router setup, global providers, styles
-├── pages/                # SandboxPage layout composition
+├── screens/              # SandboxPage layout composition
 ├── widgets/              # Large composite components (TopBar, Sidebar, CodeWorkspace)
 ├── features/             # Business capabilities (TriggerAiGeneration, EditCodeInline)
 ├── entities/             # Domain business models (FileSystem, AiSession)
@@ -96,7 +96,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ```text
 src/
 ├── app/                  # Инициализация Next.js, глобальные провайдеры контекста, стили
-├── pages/                # Композиция главного экрана SandboxPage
+├── screens/              # Композиция главного экрана SandboxPage
 ├── widgets/              # Крупные блоки интерфейса (TopBar, Sidebar, CodeWorkspace)
 ├── features/             # Бизнес-фичи с триггерами (TriggerAiGeneration, EditCodeInline)
 ├── entities/             # Бизнес-сущности и модели данных (FileSystem, AiSession)

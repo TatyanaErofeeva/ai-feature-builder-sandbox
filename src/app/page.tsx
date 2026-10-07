@@ -1,4 +1,4 @@
-import { SandboxPage } from '@/pages/SandboxPage';
+import { SandboxPage } from '@/screens/SandboxPage';
 
 export default function HomePage() {
   return <SandboxPage />;
