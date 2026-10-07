@@ -2,7 +2,14 @@
 
 import dynamic from 'next/dynamic';
 import type { BeforeMount } from '@monaco-editor/react';
-import { Component, useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
+import {
+  Component,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from 'react';
 import { useUnit } from 'effector-react';
 import { $isGenerating } from '@/entities/AiSession';
 import {
@@ -86,6 +93,7 @@ const prepareEditor: BeforeMount = (monaco) => {
 
 const SAVE_DELAY_MS = 300;
 const PREVIEW_INTERVAL_MS = 120;
+const ERROR_HOLD_MS = 1500;
 
 export function CodeWorkspace() {
   const [activeFile, generating, saveContent] = useUnit([
@@ -219,13 +227,14 @@ function editorLanguage(file: FileNode): string {
 }
 
 function PreviewPane({ file }: { file: FileNode | null }) {
+  const generating = useUnit($isGenerating);
   const source = file?.id.endsWith('.tsx') ? file.content : null;
   const compiled = usePreviewCompile(source);
-  const resetKey = `${file?.id ?? 'none'}:${compiled?.revision ?? 0}:${compiled?.ok ? 'ok' : 'err'}`;
+  const view = useStablePreview(file, compiled, generating);
 
   return (
-    <CompilationBoundary resetKey={resetKey}>
-      <ComponentRunner file={file} compiled={compiled} />
+    <CompilationBoundary resetKey={`${file?.id ?? 'none'}:${view.resetKey}`}>
+      <ComponentRunner file={file} view={view} />
     </CompilationBoundary>
   );
 }
@@ -245,6 +254,85 @@ interface FailedCompile {
 }
 
 type PreviewCompile = ReadyCompile | FailedCompile;
+
+type PreviewView =
+  | { phase: 'idle'; resetKey: string }
+  | { phase: 'compiling'; resetKey: string }
+  | { phase: 'ready'; resetKey: string; Component: ComponentType }
+  | { phase: 'error'; resetKey: string; message: string };
+
+function useStablePreview(
+  file: FileNode | null,
+  compiled: PreviewCompile | null,
+  generating: boolean,
+): PreviewView {
+  const fileId = file?.id ?? null;
+  const isTsx = fileId?.endsWith('.tsx') ?? false;
+  const matchesFile = Boolean(compiled && file && compiled.content === file.content);
+  const failureKey =
+    matchesFile && compiled && !compiled.ok ? `${compiled.revision}:${compiled.content}` : null;
+  const [visibleFailureKey, setVisibleFailureKey] = useState<string | null>(null);
+  const lastGoodRef = useRef<{ fileId: string; snapshot: ReadyCompile } | null>(null);
+
+  if (lastGoodRef.current && lastGoodRef.current.fileId !== fileId) {
+    lastGoodRef.current = null;
+  }
+
+  if (matchesFile && compiled?.ok && fileId) {
+    lastGoodRef.current = { fileId, snapshot: compiled };
+  }
+
+  useEffect(() => {
+    if (failureKey === null || !generating) {
+      setVisibleFailureKey(failureKey);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setVisibleFailureKey(failureKey);
+    }, ERROR_HOLD_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [failureKey, generating]);
+
+  if (!isTsx) {
+    return { phase: 'idle', resetKey: 'idle' };
+  }
+
+  if (!matchesFile || !compiled) {
+    return { phase: 'compiling', resetKey: 'compiling' };
+  }
+
+  if (compiled.ok) {
+    return {
+      phase: 'ready',
+      resetKey: `ok:${compiled.revision}`,
+      Component: compiled.Component,
+    };
+  }
+
+  const settled = !generating || visibleFailureKey === failureKey;
+
+  if (settled) {
+    return {
+      phase: 'error',
+      resetKey: `err:${compiled.revision}`,
+      message: compiled.message,
+    };
+  }
+
+  const lastGood = lastGoodRef.current;
+
+  if (lastGood?.fileId === fileId) {
+    return {
+      phase: 'ready',
+      resetKey: `held:${lastGood.snapshot.revision}`,
+      Component: lastGood.snapshot.Component,
+    };
+  }
+
+  return { phase: 'compiling', resetKey: 'compiling' };
+}
 
 function usePreviewCompile(source: string | null): PreviewCompile | null {
   const [snapshot, setSnapshot] = useState<PreviewCompile | null>(null);
@@ -312,14 +400,8 @@ async function compileSource(source: string): Promise<CompileResult> {
   return compileComponent(babelModule, source, reactModule);
 }
 
-function ComponentRunner({
-  file,
-  compiled,
-}: {
-  file: FileNode | null;
-  compiled: PreviewCompile | null;
-}) {
-  if (!file || !file.id.endsWith('.tsx')) {
+function ComponentRunner({ file, view }: { file: FileNode | null; view: PreviewView }) {
+  if (!file || !file.id.endsWith('.tsx') || view.phase === 'idle') {
     return (
       <p className="font-mono text-sm leading-relaxed text-zinc-400">
         Preview available for React components (*.tsx) only
@@ -327,15 +409,15 @@ function ComponentRunner({
     );
   }
 
-  if (!compiled || compiled.content !== file.content) {
+  if (view.phase === 'compiling') {
     return <p className="font-mono text-sm text-zinc-500">Compiling preview...</p>;
   }
 
-  if (!compiled.ok) {
-    return <CompilationMessage message={compiled.message} />;
+  if (view.phase === 'error') {
+    return <CompilationMessage message={view.message} />;
   }
 
-  const View = compiled.Component as ComponentType<{ children?: ReactNode }>;
+  const View = view.Component as ComponentType<{ children?: ReactNode }>;
 
   if (file.name === 'layout.tsx') {
     return (

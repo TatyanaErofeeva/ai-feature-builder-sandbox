@@ -259,6 +259,7 @@ const field = {
   background: "#0c1218",
   color: "#d5dee8",
   padding: "10px 12px",
+  minWidth: 0,
 };
 
 const add = {
