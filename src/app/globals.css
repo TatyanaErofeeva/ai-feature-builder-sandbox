@@ -1,0 +1,23 @@
+@layer theme, base, mui, components, utilities;
+@import 'tailwindcss';
+
+@theme inline {
+  --font-sans: var(--font-manrope), 'Segoe UI', sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0b0f14;
+  color: #d5dee8;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2c3b4c transparent;
+}
